@@ -1,4 +1,4 @@
-Features/Usecases
+Features/Usecases:
 Basic Setup/deployment of AS cluster using available operator using local disk file
 Using AQL to read/write
 Setting up an AMC which can talk to the AS cluster
@@ -21,10 +21,12 @@ Performance/Spec/NFR/Benchmarking
 Data Durability
 Latency - more-so with network attached storage
 Throughput
-Source
+
+Source:
 https://github.com/operator-framework/awesome-operators
 https://operatorhub.io/
-Curated List
+
+Curated List:
 https://github.com/aerospike/aerospike-kubernetes-operator
 https://github.com/travelaudience/aerospike-operator
 https://tech.travelaudience.com/aerospike-operator-aerospike-atop-kubernetes-made-easy-e79301dd8c35

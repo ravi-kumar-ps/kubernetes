@@ -1,7 +1,7 @@
 StatefulSet is a namespace scoped Kubernetes API resource type that is used to manage Stateful workloads (See Definition of Stateful Workload). A StatefulSet manifest is shown in the example below. Note that in the below manifest, a Service is defined alongside the StatefulSet and the reason for having it is explained in Stable Network Identity of Stateful Pods.
 
 apiVersion: v1
-kind: Service
+kind: Service 
 metadata:
   labels:
     app: demo-nginx-sf

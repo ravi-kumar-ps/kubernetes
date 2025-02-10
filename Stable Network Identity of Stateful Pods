@@ -1,0 +1,24 @@
+Stable Network Identity of Stateful Pods:
+
+Stable network identities are an important requirement for Pods under a StatefulSet. In case of stateless Deployments, each underlying pod is replaceable (ephemeral) and the network identity of a particular Pod within the Deployment is not important. However, each Pod in a StatefulSet can play specific roles, for example, Master Pod, Hot-Stand-By Pod, Slave Pod, etc. can together form a StatefulSet representing a replicated and highly available database. In such cases, it is important to have stable network identities for the Pods that are preserved across Pods getting killed and re-created.
+
+This is where Headless Services become useful. Users need to provide clusterIP: None in the Service.spec.clusterIP to define the service as a Headless Service as shown in the manifest below. As illustrated in StatefulSet, the StatefulSet.spec.serviceName should refer to this Headless service, so that the StatefulSet controller in the KaaS control plane can configure DNS names for the Pods in the StatefulSet in the form {StatefulSet.metadata.name}-{Pod ordinal}.{StatefulSet.metadata.name}.{namespace}.svc.cluster.local
+
+headless-svc.yaml:
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: demo-nginx-sf
+  name: demo-nginx-stateful
+  namespace: test
+spec:
+  clusterIP: None
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: demo-nginx-sf
+  type: ClusterIP

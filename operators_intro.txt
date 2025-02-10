@@ -1,0 +1,32 @@
+Features/Usecases
+Basic Setup/deployment of AS cluster using available operator using local disk file
+Using AQL to read/write
+Setting up an AMC which can talk to the AS cluster
+Using Smart client to talk to AS cluster - outside of namespace and outside of cluster.
+Adding/Deleting a new node in cluster should reflect in AMC
+Config changes should be supported for the AS deployed
+Live configs
+Cosmos support for server side AS metrics
+Version upgrade - both minor and major version
+Handling node going down and coming back up
+Backup with noah
+XDC replication requirements
+Log access - logsvc might not be needed and pod level logs will be desired
+Multiple environments & clusters (CH & Hyd)
+Persistent volume management - JBOD and NVM over TCP
+Flow based deployment
+Various modes - In-memory, Disk based and Hybrid
+Difference in handling community & enterprise editions - More usecases for community inside FK
+Performance/Spec/NFR/Benchmarking
+Data Durability
+Latency - more-so with network attached storage
+Throughput
+Source
+https://github.com/operator-framework/awesome-operators
+https://operatorhub.io/
+Curated List
+https://github.com/aerospike/aerospike-kubernetes-operator
+https://github.com/travelaudience/aerospike-operator
+https://tech.travelaudience.com/aerospike-operator-aerospike-atop-kubernetes-made-easy-e79301dd8c35
+https://github.com/aerospike/aerospike-kubernetes
+https://www.aerospike.com/docs/deploy_guides/kubernetes/examples/

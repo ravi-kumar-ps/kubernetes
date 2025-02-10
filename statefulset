@@ -72,7 +72,7 @@ spec:
         requests:
           storage: 1Gi
       storageClassName: jbod-ssd-0
-      volumeMode: Filesystem
+      volumeMode: Filesystem 
 
 In case of stateless applications, Users do not run create Pods individually, but create objects of resource type Deployment. Each Deployment object in turn owns objects of type ReplicaSet, that governs the running of required number of identical replica Pods that share the same spec.
 

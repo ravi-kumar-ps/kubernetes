@@ -77,3 +77,91 @@ spec:
 In case of stateless applications, Users do not run create Pods individually, but create objects of resource type Deployment. Each Deployment object in turn owns objects of type ReplicaSet, that governs the running of required number of identical replica Pods that share the same spec.
 
 Similarly in case of stateful applications, Users should create objects of resource type StatefulSet that governs the running of required number of identical replica Pods (preferrably using persistentVolumeClaim type volumes). However, there are some major differences between Deployments and StatefulSets as mentioned below.
+
+Pods in StatefulSet have sticky identifiers: 
+
+  Unlike in case of Deployment, sticky (persistent) identities are maintained for the pods that are owned by a StatefulSet. As shown in the examples below, there is a Deployment object named demo-nginx-deployment with replica size of 2. When we delete one Pod demo-nginx-deployment-6fd5db57fb-z6mdw under that Deployment, another Pod is created but with a different name  demo-nginx-deployment-6fd5db57fb-4bssf. Next, the similar steps are repeated for the StatefulSet named demo-nginx-stateful with replica size of 2. We delete the Pod named demo-nginx-stateful-1 and a new Pod gets created with the same name.
+
+$ kubectl get deployment
+NAME                    READY   UP-TO-DATE   AVAILABLE   AGE
+demo-nginx-deployment   2/2     2            2           9d
+ 
+$ kubectl get pods
+NAME                                     READY   STATUS    RESTARTS   AGE
+demo-nginx-deployment-6fd5db57fb-9dgmj   1/1     Running   0          9d
+demo-nginx-deployment-6fd5db57fb-z6mdw   1/1     Running   0          9d
+ 
+$ kubectl delete pod demo-nginx-deployment-6fd5db57fb-z6mdw
+pod "demo-nginx-deployment-6fd5db57fb-z6mdw" deleted
+ 
+$ kubectl get pods
+NAME                                            READY   STATUS    RESTARTS   AGE
+demo-nginx-deployment-6fd5db57fb-4bssf   1/1     Running   0          71s
+demo-nginx-deployment-6fd5db57fb-9dgmj   1/1     Running   0          9d
+ 
+$ kubectl get statefulset
+NAME                    READY   AGE
+demo-nginx-stateful     2/2     9d
+ 
+$ kubectl get pods
+NAME                                          READY   STATUS    RESTARTS   AGE
+demo-nginx-stateful-0                         1/1     Running   0          9d
+demo-nginx-stateful-1                         1/1     Running   0          9d
+ 
+$ kubectl delete pod demo-nginx-stateful-1
+pod "demo-nginx-stateful-1" deleted
+ 
+$ kubectl get pods
+NAME                                          READY   STATUS              RESTARTS   AGE
+demo-nginx-stateful-0                         1/1     Running             0          9d
+demo-nginx-stateful-1                         1/1     Running             0          45s
+
+Pods in StatefulSet are named as {StatefulSetName}-{ordinal}:
+
+As shown in the above illustration of sticky identifiers, another point to note is that the Pods in a StatefulSet follow the naming convention of {StatefulSet.metadata.name}-{oridinal}. Thus the 1st Pod in StatefulSet named demo-nginx-stateful is named demo-nginx-stateful-0 and 2nd Pod is named demo-nginx-stateful-1.
+
+Pods in StatefulSet are configured to be created, scaled up and scaled down in order by default:
+
+StatefulSet.spec.podManagementPolicy defines how Pods within a StatefulSet is created, scaled up or down. By default, the value is OrderedReady which implies that scale ups will strictly be in increasing order and scale downs will strictly be in decreasing order of the pod ordinal. It means, the 2nd pod will be created only after the 1st pod goes to Running state. If for some reason the 1st Pod is stuck in say ContainerCreating state, then the 2nd pod would not be created at all. Similarly during scale down, 3rd pod will be deleted only after 4th pod has been deleted.
+$ kubectl create -f demo-nginx-stateful.yaml
+ 
+$ kubectl get pods
+NAME                                          READY   STATUS    RESTARTS   AGE
+demo-nginx-stateful-0                         1/1     Running   0          20s
+ 
+$ kubectl get pods
+NAME                                          READY   STATUS    RESTARTS   AGE
+demo-nginx-stateful-0                         1/1     Running   0          35s
+demo-nginx-stateful-1                         1/1     Running   0          10s
+ 
+$ kubectl scale statefulset demo-nginx-stateful --replicas=4
+statefulset.apps/demo-nginx-stateful scaled
+ 
+$ kubectl get pods
+NAME                                          READY   STATUS    RESTARTS   AGE
+demo-nginx-stateful-0                         1/1     Running   0          71s
+demo-nginx-stateful-1                         1/1     Running   0          50s
+demo-nginx-stateful-2                         1/1     Running   0          21s
+ 
+$ kubectl get pods
+NAME                                          READY   STATUS    RESTARTS   AGE
+demo-nginx-stateful-0                         1/1     Running   0          83s
+demo-nginx-stateful-1                         1/1     Running   0          70s
+demo-nginx-stateful-2                         1/1     Running   0          45s
+demo-nginx-stateful-3                         1/1     Running   0          12s
+ 
+$ kubectl scale statefulset demo-nginx-stateful --replicas=2
+statefulset.apps/demo-nginx-stateful scaled
+ 
+$ kubectl get pods
+NAME                                          READY   STATUS        RESTARTS   AGE
+demo-nginx-stateful-0                         1/1     Running       0          53m
+demo-nginx-stateful-1                         1/1     Running       0          53m
+demo-nginx-stateful-2                         1/1     Running       0          52m
+demo-nginx-stateful-3                         0/1     Terminating   0          52m
+ 
+$ kubectl get pods
+NAME                                          READY   STATUS       RESTARTS   AGE
+demo-nginx-stateful-0                         1/1     Running      0          54m
+demo-nginx-stateful-1                         1/1     Running      0          54m
+demo-nginx-stateful-2                         0/1     Terminating  0          53m
